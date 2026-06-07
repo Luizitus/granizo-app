@@ -228,8 +228,8 @@ function DetalheVeiculo() {
               <h4 style={{ marginBottom: '0.75rem', color: '#666' }}>Fotos de Entrada</h4>
               <div style={styles.galeria}>
                 {fotosEntrada.map(f => (
-                  <a key={f.id_foto} href={`http://localhost:3001/uploads/${f.caminho}`} target="_blank" rel="noreferrer">
-                    <img src={`http://localhost:3001/uploads/${f.caminho}`} alt="Foto de entrada" style={styles.foto} />
+                  <a key={f.id_foto} href={`${import.meta.env.VITE_API_URL.replace('/api', '')}/uploads/${f.caminho}`} target="_blank" rel="noreferrer">
+                    <img src={`${import.meta.env.VITE_API_URL.replace('/api', '')}/uploads/${f.caminho}`} alt="Foto de entrada" style={styles.foto} />
                   </a>
                 ))}
               </div>
@@ -240,8 +240,8 @@ function DetalheVeiculo() {
               <h4 style={{ marginBottom: '0.75rem', color: '#666' }}>Fotos de Saída</h4>
               <div style={styles.galeria}>
                 {fotosSaida.map(f => (
-                  <a key={f.id_foto} href={`http://localhost:3001/uploads/${f.caminho}`} target="_blank" rel="noreferrer">
-                    <img src={`http://localhost:3001/uploads/${f.caminho}`} alt="Foto de saída" style={styles.foto} />
+                  <a key={f.id_foto} href={`${import.meta.env.VITE_API_URL.replace('/api', '')}/uploads/${f.caminho}`} target="_blank" rel="noreferrer">
+                    <img src={`${import.meta.env.VITE_API_URL.replace('/api', '')}/uploads/${f.caminho}`} alt="Foto de saída" style={styles.foto} />
                   </a>
                 ))}
               </div>
