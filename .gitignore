@@ -1,0 +1,14 @@
+# Backend
+backend/node_modules
+backend/granizo.db
+backend/granizo.db-shm
+backend/granizo.db-wal
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Frontend
+frontend/node_modules
+frontend/dist
+
+# Sistema
+.DS_Store
