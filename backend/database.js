@@ -75,6 +75,13 @@ db.exec(`
       tipo       TEXT DEFAULT 'entrada',
       FOREIGN KEY (id_veiculo) REFERENCES veiculo(id_veiculo)
     );
+    CREATE TABLE IF NOT EXISTS usuarios (
+    id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome       TEXT NOT NULL,
+    email      TEXT NOT NULL UNIQUE,
+    senha      TEXT NOT NULL,
+    perfil     TEXT NOT NULL DEFAULT 'operador'
+    );
   `);
 
   console.log('Banco de dados conectado e tabelas criadas.');

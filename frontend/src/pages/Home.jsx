@@ -15,6 +15,7 @@ function Home() {
   }, [])
 
   if (carregando) return <p>Carregando...</p>
+  if (!resumo) return <p>Erro ao carregar dados.</p>  // linha nova
 
   const cards = [
     { label: 'Total de veículos', valor: resumo.total,           cor: '#1a1a2e', rota: '/veiculos' },
