@@ -15,6 +15,8 @@ import Modelos from './pages/Modelos'
 import Tecnicos from './pages/Tecnicos'
 import Relatorios from './pages/Relatorios'
 import { useAuth } from './context/AuthContext'
+import Usuarios from './pages/Usuarios'
+
 
 function App() {
   const { usuario } = useAuth()
@@ -36,6 +38,7 @@ function App() {
           <Route path="/modelos" element={<RotaProtegida><Modelos /></RotaProtegida>} />
           <Route path="/tecnicos" element={<RotaProtegida><Tecnicos /></RotaProtegida>} />
           <Route path="/relatorios" element={<RotaProtegida><Relatorios /></RotaProtegida>} />
+          <Route path="/usuarios" element={<RotaProtegida><Usuarios /></RotaProtegida>} />
         </Routes>
       </div>
     </>

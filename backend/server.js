@@ -26,6 +26,7 @@ const modeloRoutes  = require('./routes/modelos')
 const veiculoRoutes = require('./routes/veiculos')
 const tecnicoRoutes = require('./routes/tecnicos')
 const fotosRoutes   = require('./routes/fotos')
+const usuarioRoutes = require('./routes/usuarios')
 
 app.use('/api/clientes', verificarToken, clienteRoutes)
 app.use('/api/marcas',   verificarToken, marcaRoutes)
@@ -33,6 +34,7 @@ app.use('/api/modelos',  verificarToken, modeloRoutes)
 app.use('/api/veiculos', verificarToken, veiculoRoutes)
 app.use('/api/tecnicos', verificarToken, tecnicoRoutes)
 app.use('/api/fotos',    verificarToken, fotosRoutes)
+app.use('/api/usuarios', verificarToken, usuarioRoutes)
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`)

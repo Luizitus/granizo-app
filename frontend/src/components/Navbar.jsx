@@ -23,6 +23,9 @@ function Navbar() {
         <Link to="/marcas" style={styles.link}>Marcas</Link>
         <Link to="/modelos" style={styles.link}>Modelos</Link>
         <Link to="/relatorios" style={styles.link}>Relatórios</Link>
+        {usuario?.perfil === 'admin' && (
+  <Link to="/usuarios" style={styles.link}>Usuários</Link>
+)}
       </div>
       <div style={styles.usuario}>
         <span style={styles.nomeUsuario}>👤 {usuario?.nome}</span>
