@@ -102,5 +102,46 @@ const resumo = (req, res) => {
     entregue:        entregue.total,
   });
 }
+const graficos = (req, res) => {
+  // Veículos por status
+  const porStatus = db.prepare(`
+    SELECT status, COUNT(*) as total
+    FROM veiculo
+    GROUP BY status
+  `).all()
 
-module.exports = { listar, buscarPorId, cadastrar, atualizar, atualizarStatus, atualizarTecnico, resumo };
+  // Entradas por mês (últimos 6 meses)
+  const porMes = db.prepare(`
+    SELECT
+      strftime('%Y-%m', data_entrada) as mes,
+      COUNT(*) as total
+    FROM veiculo
+    WHERE data_entrada >= date('now', '-6 months')
+    GROUP BY mes
+    ORDER BY mes ASC
+  `).all()
+
+  // Veículos por marca
+  const porMarca = db.prepare(`
+    SELECT ma.marca, COUNT(*) as total
+    FROM veiculo v
+    JOIN marca ma ON v.id_marca = ma.id_marca
+    GROUP BY ma.marca
+    ORDER BY total DESC
+    LIMIT 5
+  `).all()
+
+  // Tempo médio de serviço (em dias) dos entregues
+  const tempoMedio = db.prepare(`
+    SELECT ROUND(AVG(
+      julianday(data_entrega) - julianday(data_entrada)
+    ), 1) as media_dias
+    FROM veiculo
+    WHERE status = 'entregue'
+    AND data_entrega IS NOT NULL
+  `).get()
+
+  res.json({ porStatus, porMes, porMarca, tempoMedio: tempoMedio.media_dias || 0 })
+}
+
+module.exports = { listar, buscarPorId, cadastrar, atualizar, atualizarStatus, atualizarTecnico, resumo, graficos };
