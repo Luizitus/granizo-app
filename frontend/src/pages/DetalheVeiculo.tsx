@@ -1,9 +1,10 @@
-// src/pages/DetalheVeiculo.jsx
+// src/pages/DetalheVeiculo.tsx
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../services/api'
+import { Veiculo, Tecnico, Foto, StatusVeiculo } from '../types'
 
-const statusValidos = [
+const statusValidos: { valor: StatusVeiculo; label: string }[] = [
   { valor: 'em_analise',      label: 'Em análise' },
   { valor: 'em_servico',      label: 'Em serviço' },
   { valor: 'aguardando_peca', label: 'Aguardando peça' },
@@ -11,7 +12,7 @@ const statusValidos = [
   { valor: 'entregue',        label: 'Entregue' },
 ]
 
-const cores = {
+const cores: Record<StatusVeiculo, string> = {
   em_analise:      '#f6ad55',
   em_servico:      '#63b3ed',
   aguardando_peca: '#fc8181',
@@ -20,39 +21,41 @@ const cores = {
 }
 
 function DetalheVeiculo() {
-  const { id } = useParams()
+  const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [veiculo, setVeiculo] = useState(null)
-  const [carregando, setCarregando] = useState(true)
-  const [novoStatus, setNovoStatus] = useState('')
-  const [salvando, setSalvando] = useState(false)
-  const [mensagem, setMensagem] = useState('')
-  const [fotos, setFotos] = useState([])
-  const [fotoSelecionada, setFotoSelecionada] = useState(null)
-  const [tipoFoto, setTipoFoto] = useState('entrada')
-  const [enviandoFoto, setEnviandoFoto] = useState(false)
-  const [mensagemFoto, setMensagemFoto] = useState('')
-  const [tecnicos, setTecnicos] = useState([])
-  const [tecnicoSelecionado, setTecnicoSelecionado] = useState('')
-  const [salvandoTecnico, setSalvandoTecnico] = useState(false)
-  const [mensagemTecnico, setMensagemTecnico] = useState('')
+  const [veiculo, setVeiculo] = useState<Veiculo | null>(null)
+  const [carregando, setCarregando] = useState<boolean>(true)
+  const [novoStatus, setNovoStatus] = useState<StatusVeiculo>('em_analise')
+  const [salvando, setSalvando] = useState<boolean>(false)
+  const [mensagem, setMensagem] = useState<string>('')
+  const [fotos, setFotos] = useState<Foto[]>([])
+  const [fotoSelecionada, setFotoSelecionada] = useState<File | null>(null)
+  const [tipoFoto, setTipoFoto] = useState<'entrada' | 'saida'>('entrada')
+  const [enviandoFoto, setEnviandoFoto] = useState<boolean>(false)
+  const [mensagemFoto, setMensagemFoto] = useState<string>('')
+  const [tecnicos, setTecnicos] = useState<Tecnico[]>([])
+  const [tecnicoSelecionado, setTecnicoSelecionado] = useState<string>('')
+  const [salvandoTecnico, setSalvandoTecnico] = useState<boolean>(false)
+  const [mensagemTecnico, setMensagemTecnico] = useState<string>('')
+
+  const apiUrl = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3001'
 
   useEffect(() => {
-    api.get(`/veiculos/${id}`)
+    api.get<Veiculo>(`/veiculos/${id}`)
       .then(res => {
         setVeiculo(res.data)
         setNovoStatus(res.data.status)
-        setTecnicoSelecionado(res.data.id_tecnico || '')
+        setTecnicoSelecionado(res.data.id_tecnico?.toString() || '')
       })
       .catch(() => navigate('/veiculos'))
       .finally(() => setCarregando(false))
 
     carregarFotos()
-    api.get('/tecnicos').then(res => setTecnicos(res.data))
+    api.get<Tecnico[]>('/tecnicos').then(res => setTecnicos(res.data))
   }, [id])
 
   const carregarFotos = () => {
-    api.get(`/fotos/${id}`).then(res => setFotos(res.data))
+    api.get<Foto[]>(`/fotos/${id}`).then(res => setFotos(res.data))
   }
 
   const atualizarStatus = async () => {
@@ -89,7 +92,7 @@ function DetalheVeiculo() {
     setMensagemFoto('')
     const formData = new FormData()
     formData.append('foto', fotoSelecionada)
-    formData.append('id_veiculo', id)
+    formData.append('id_veiculo', id!)
     formData.append('tipo', tipoFoto)
     try {
       await api.post('/fotos', formData, {
@@ -98,7 +101,8 @@ function DetalheVeiculo() {
       setFotoSelecionada(null)
       setMensagemFoto('Foto enviada com sucesso!')
       carregarFotos()
-      document.getElementById('inputFoto').value = ''
+      const input = document.getElementById('inputFoto') as HTMLInputElement
+      if (input) input.value = ''
     } catch (err) {
       setMensagemFoto('Erro ao enviar foto.')
     } finally {
@@ -114,24 +118,23 @@ function DetalheVeiculo() {
 
   return (
     <div>
-      {/* Cabeçalho */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-            <button onClick={() => navigate('/veiculos')} style={styles.botaoVoltar}>← Voltar</button>
-            <h2 style={{ marginTop: '0.5rem' }}>Veículo {veiculo.placa}</h2>
+          <button onClick={() => navigate('/veiculos')} style={styles.botaoVoltar}>← Voltar</button>
+          <h2 style={{ marginTop: '0.5rem' }}>Veículo {veiculo.placa}</h2>
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <button onClick={() => navigate(`/veiculos/${id}/editar`)} style={styles.botaoEditar}>
+          <button onClick={() => navigate(`/veiculos/${id}/editar`)} style={styles.botaoEditar}>
             ✏️ Editar dados
-            </button>
-            <span style={{ ...styles.badge, backgroundColor: cores[veiculo.status] }}>
+          </button>
+          <span style={{ ...styles.badge, backgroundColor: cores[veiculo.status] }}>
             {statusValidos.find(s => s.valor === veiculo.status)?.label}
-            </span>
+          </span>
         </div>
-        </div>
+      </div>
+
       <div style={styles.grid}>
 
-        {/* Dados do veículo */}
         <div style={styles.card}>
           <h3 style={styles.cardTitulo}>Dados do Veículo</h3>
           <div style={styles.info}><span style={styles.chave}>Placa</span><span>{veiculo.placa}</span></div>
@@ -141,7 +144,6 @@ function DetalheVeiculo() {
           <div style={styles.info}><span style={styles.chave}>Data de entrega</span><span>{veiculo.data_entrega || '—'}</span></div>
         </div>
 
-        {/* Dados do cliente */}
         <div style={styles.card}>
           <h3 style={styles.cardTitulo}>Proprietário</h3>
           <div style={styles.info}><span style={styles.chave}>Nome</span><span>{veiculo.cliente_nome}</span></div>
@@ -149,7 +151,6 @@ function DetalheVeiculo() {
           <div style={styles.info}><span style={styles.chave}>Técnico responsável</span><span>{veiculo.tecnico_nome || '—'}</span></div>
         </div>
 
-        {/* Avaliação do serviço */}
         <div style={styles.card}>
           <h3 style={styles.cardTitulo}>Avaliação do Serviço</h3>
           <div style={styles.info}><span style={styles.chave}>Amassados</span><span>{veiculo.qtde_amassados}</span></div>
@@ -160,10 +161,9 @@ function DetalheVeiculo() {
           <div style={styles.info}><span style={styles.chave}>Faturar</span><span>{veiculo.faturar ? 'Sim' : 'Não'}</span></div>
         </div>
 
-        {/* Atualizar status */}
         <div style={styles.card}>
           <h3 style={styles.cardTitulo}>Atualizar Status</h3>
-          <select style={styles.select} value={novoStatus} onChange={e => setNovoStatus(e.target.value)}>
+          <select style={styles.select} value={novoStatus} onChange={e => setNovoStatus(e.target.value as StatusVeiculo)}>
             {statusValidos.map(s => (
               <option key={s.valor} value={s.valor}>{s.label}</option>
             ))}
@@ -178,15 +178,12 @@ function DetalheVeiculo() {
           )}
         </div>
 
-        {/* Vincular técnico */}
         <div style={{ ...styles.card, gridColumn: '1 / -1' }}>
           <h3 style={styles.cardTitulo}>Técnico Responsável</h3>
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <select
-              style={{ ...styles.select, marginBottom: 0, flex: 1 }}
+            <select style={{ ...styles.select, marginBottom: 0, flex: 1 }}
               value={tecnicoSelecionado}
-              onChange={e => setTecnicoSelecionado(e.target.value)}
-            >
+              onChange={e => setTecnicoSelecionado(e.target.value)}>
               <option value="">Sem técnico</option>
               {tecnicos.map(t => (
                 <option key={t.id_tecnico} value={t.id_tecnico}>{t.nome}</option>
@@ -203,14 +200,13 @@ function DetalheVeiculo() {
           )}
         </div>
 
-        {/* Upload de fotos */}
         <div style={{ ...styles.card, gridColumn: '1 / -1' }}>
           <h3 style={styles.cardTitulo}>Fotos</h3>
           <div style={styles.uploadArea}>
             <input id="inputFoto" type="file" accept="image/*"
-              onChange={e => setFotoSelecionada(e.target.files[0])} style={{ flex: 1 }} />
+              onChange={e => setFotoSelecionada(e.target.files?.[0] || null)} style={{ flex: 1 }} />
             <select style={{ ...styles.select, width: 'auto', marginBottom: 0 }}
-              value={tipoFoto} onChange={e => setTipoFoto(e.target.value)}>
+              value={tipoFoto} onChange={e => setTipoFoto(e.target.value as 'entrada' | 'saida')}>
               <option value="entrada">Entrada</option>
               <option value="saida">Saída</option>
             </select>
@@ -228,8 +224,8 @@ function DetalheVeiculo() {
               <h4 style={{ marginBottom: '0.75rem', color: '#666' }}>Fotos de Entrada</h4>
               <div style={styles.galeria}>
                 {fotosEntrada.map(f => (
-                  <a key={f.id_foto} href={`${import.meta.env.VITE_API_URL.replace('/api', '')}/uploads/${f.caminho}`} target="_blank" rel="noreferrer">
-                    <img src={`${import.meta.env.VITE_API_URL.replace('/api', '')}/uploads/${f.caminho}`} alt="Foto de entrada" style={styles.foto} />
+                  <a key={f.id_foto} href={`${apiUrl}/uploads/${f.caminho}`} target="_blank" rel="noreferrer">
+                    <img src={`${apiUrl}/uploads/${f.caminho}`} alt="Foto de entrada" style={styles.foto} />
                   </a>
                 ))}
               </div>
@@ -240,8 +236,8 @@ function DetalheVeiculo() {
               <h4 style={{ marginBottom: '0.75rem', color: '#666' }}>Fotos de Saída</h4>
               <div style={styles.galeria}>
                 {fotosSaida.map(f => (
-                  <a key={f.id_foto} href={`${import.meta.env.VITE_API_URL.replace('/api', '')}/uploads/${f.caminho}`} target="_blank" rel="noreferrer">
-                    <img src={`${import.meta.env.VITE_API_URL.replace('/api', '')}/uploads/${f.caminho}`} alt="Foto de saída" style={styles.foto} />
+                  <a key={f.id_foto} href={`${apiUrl}/uploads/${f.caminho}`} target="_blank" rel="noreferrer">
+                    <img src={`${apiUrl}/uploads/${f.caminho}`} alt="Foto de saída" style={styles.foto} />
                   </a>
                 ))}
               </div>
@@ -257,7 +253,7 @@ function DetalheVeiculo() {
   )
 }
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' },
   card: { backgroundColor: '#fff', padding: '1.5rem', borderRadius: '8px' },
   cardTitulo: { color: '#1a1a2e', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '2px solid #1a1a2e' },
@@ -265,13 +261,12 @@ const styles = {
   chave: { fontWeight: 'bold', color: '#666', fontSize: '0.9rem' },
   badge: { padding: '0.4rem 1rem', borderRadius: '999px', color: '#fff', fontWeight: 'bold' },
   botaoVoltar: { background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: '0.9rem' },
+  botaoEditar: { backgroundColor: '#1a1a2e', color: '#fff', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '6px', fontSize: '0.95rem', cursor: 'pointer' },
   select: { width: '100%', padding: '0.6rem', borderRadius: '6px', border: '1px solid #cbd5e0', fontSize: '1rem', marginBottom: '1rem' },
   botao: { backgroundColor: '#1a1a2e', color: '#fff', padding: '0.75rem 1.5rem', border: 'none', borderRadius: '6px', fontSize: '1rem', cursor: 'pointer' },
   uploadArea: { display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' },
   galeria: { display: 'flex', flexWrap: 'wrap', gap: '0.75rem' },
   foto: { width: '150px', height: '150px', objectFit: 'cover', borderRadius: '8px', border: '2px solid #e2e8f0', cursor: 'pointer' },
-  botaoEditar: { backgroundColor: '#1a1a2e', color: '#fff', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '6px', fontSize: '0.95rem', cursor: 'pointer' },
-  //botaoEditar: { backgroundColor: '#f0f2f5', border: 'none', padding: '0.6rem 1.2rem', borderRadius: '6px', fontSize: '0.95rem', cursor: 'pointer' },
 }
 
 export default DetalheVeiculo

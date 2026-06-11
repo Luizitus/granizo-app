@@ -1,11 +1,12 @@
-// src/pages/Relatorios.jsx
+// src/pages/Relatorios.tsx
 import { useEffect, useState } from 'react'
 import api from '../services/api'
+import { Veiculo, StatusVeiculo } from '../types'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import * as XLSX from 'xlsx'
 
-const statusLabel = {
+const statusLabel: Record<StatusVeiculo, string> = {
   em_analise:      'Em análise',
   em_servico:      'Em serviço',
   aguardando_peca: 'Aguardando peça',
@@ -13,15 +14,23 @@ const statusLabel = {
   entregue:        'Entregue',
 }
 
+const cores: Record<StatusVeiculo, string> = {
+  em_analise:      '#f6ad55',
+  em_servico:      '#63b3ed',
+  aguardando_peca: '#fc8181',
+  concluido:       '#68d391',
+  entregue:        '#a0aec0',
+}
+
 function Relatorios() {
-  const [veiculos, setVeiculos] = useState([])
-  const [carregando, setCarregando] = useState(true)
-  const [filtroStatus, setFiltroStatus] = useState('')
-  const [dataInicio, setDataInicio] = useState('')
-  const [dataFim, setDataFim] = useState('')
+  const [veiculos, setVeiculos] = useState<Veiculo[]>([])
+  const [carregando, setCarregando] = useState<boolean>(true)
+  const [filtroStatus, setFiltroStatus] = useState<string>('')
+  const [dataInicio, setDataInicio] = useState<string>('')
+  const [dataFim, setDataFim] = useState<string>('')
 
   useEffect(() => {
-    api.get('/veiculos')
+    api.get<Veiculo[]>('/veiculos')
       .then(res => setVeiculos(res.data))
       .finally(() => setCarregando(false))
   }, [])
@@ -35,7 +44,6 @@ function Relatorios() {
 
   const exportarPDF = () => {
     const doc = new jsPDF()
-
     doc.setFontSize(16)
     doc.text('Relatório de Veículos — Granizo App', 14, 15)
     doc.setFontSize(10)
@@ -47,8 +55,8 @@ function Relatorios() {
       head: [['Placa', 'Modelo', 'Cliente', 'Técnico', 'Entrada', 'Entrega', 'Status']],
       body: veiculosFiltrados.map(v => [
         v.placa,
-        v.modelo_nome,
-        v.cliente_nome,
+        v.modelo_nome || '—',
+        v.cliente_nome || '—',
         v.tecnico_nome || '—',
         v.data_entrada,
         v.data_entrega || '—',
@@ -64,20 +72,20 @@ function Relatorios() {
 
   const exportarExcel = () => {
     const dados = veiculosFiltrados.map(v => ({
-      Placa:          v.placa,
-      Modelo:         v.modelo_nome,
-      Marca:          v.marca_nome,
-      Cliente:        v.cliente_nome,
-      Telefone:       v.cliente_telefone,
-      Tecnico:        v.tecnico_nome || '—',
-      Amassados:      v.qtde_amassados,
-      Trabalho_Frio:  v.trabalho_a_frio ? 'Sim' : 'Não',
-      Pintura:        v.pintura ? 'Sim' : 'Não',
-      Pecas:          v.pecas_para_trocar || '—',
-      Faturar:        v.faturar ? 'Sim' : 'Não',
-      Data_Entrada:   v.data_entrada,
-      Data_Entrega:   v.data_entrega || '—',
-      Status:         statusLabel[v.status] || v.status,
+      Placa:         v.placa,
+      Modelo:        v.modelo_nome || '—',
+      Marca:         v.marca_nome  || '—',
+      Cliente:       v.cliente_nome || '—',
+      Telefone:      v.cliente_telefone || '—',
+      Tecnico:       v.tecnico_nome || '—',
+      Amassados:     v.qtde_amassados,
+      Trabalho_Frio: v.trabalho_a_frio ? 'Sim' : 'Não',
+      Pintura:       v.pintura ? 'Sim' : 'Não',
+      Pecas:         v.pecas_para_trocar || '—',
+      Faturar:       v.faturar ? 'Sim' : 'Não',
+      Data_Entrada:  v.data_entrada,
+      Data_Entrega:  v.data_entrega || '—',
+      Status:        statusLabel[v.status] || v.status,
     }))
 
     const ws = XLSX.utils.json_to_sheet(dados)
@@ -92,7 +100,6 @@ function Relatorios() {
     <div>
       <h2 style={{ marginBottom: '1.5rem' }}>Relatórios</h2>
 
-      {/* Filtros */}
       <div style={styles.card}>
         <h3 style={styles.cardTitulo}>Filtros</h3>
         <div style={styles.filtros}>
@@ -118,19 +125,12 @@ function Relatorios() {
         </div>
       </div>
 
-      {/* Resultado e exportação */}
       <div style={styles.card}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <h3 style={styles.cardTitulo}>
-            {veiculosFiltrados.length} veículo(s) encontrado(s)
-          </h3>
+          <h3 style={styles.cardTitulo}>{veiculosFiltrados.length} veículo(s) encontrado(s)</h3>
           <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <button onClick={exportarPDF} style={styles.botaoPDF}>
-              📄 Exportar PDF
-            </button>
-            <button onClick={exportarExcel} style={styles.botaoExcel}>
-              📊 Exportar Excel
-            </button>
+            <button onClick={exportarPDF} style={styles.botaoPDF}>📄 Exportar PDF</button>
+            <button onClick={exportarExcel} style={styles.botaoExcel}>📊 Exportar Excel</button>
           </div>
         </div>
 
@@ -173,15 +173,7 @@ function Relatorios() {
   )
 }
 
-const cores = {
-  em_analise:      '#f6ad55',
-  em_servico:      '#63b3ed',
-  aguardando_peca: '#fc8181',
-  concluido:       '#68d391',
-  entregue:        '#a0aec0',
-}
-
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   card: { backgroundColor: '#fff', padding: '1.5rem', borderRadius: '8px', marginBottom: '1rem' },
   cardTitulo: { color: '#1a1a2e', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '2px solid #1a1a2e' },
   filtros: { display: 'flex', gap: '1rem', flexWrap: 'wrap' },

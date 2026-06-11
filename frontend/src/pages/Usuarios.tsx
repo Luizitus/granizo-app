@@ -1,26 +1,34 @@
-// src/pages/Usuarios.jsx
+// src/pages/Usuarios.tsx
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
+import { Usuario } from '../types'
 
-const formVazio = { nome: '', email: '', senha: '', perfil: 'operador' }
+interface FormUsuario {
+  nome: string
+  email: string
+  senha: string
+  perfil: 'admin' | 'operador'
+}
+
+const formVazio: FormUsuario = { nome: '', email: '', senha: '', perfil: 'operador' }
 
 function Usuarios() {
   const { usuario } = useAuth()
-  const [usuarios, setUsuarios] = useState([])
-  const [form, setForm] = useState(formVazio)
-  const [editandoId, setEditandoId] = useState(null)
-  const [mostrarForm, setMostrarForm] = useState(false)
-  const [erro, setErro] = useState('')
-  const [enviando, setEnviando] = useState(false)
+  const [usuarios, setUsuarios] = useState<Usuario[]>([])
+  const [form, setForm] = useState<FormUsuario>(formVazio)
+  const [editandoId, setEditandoId] = useState<number | null>(null)
+  const [mostrarForm, setMostrarForm] = useState<boolean>(false)
+  const [erro, setErro] = useState<string>('')
+  const [enviando, setEnviando] = useState<boolean>(false)
 
   const carregar = () => {
-    api.get('/usuarios').then(res => setUsuarios(res.data))
+    api.get<Usuario[]>('/usuarios').then(res => setUsuarios(res.data))
   }
 
   useEffect(() => { carregar() }, [])
 
-  const handleEditar = (u) => {
+  const handleEditar = (u: Usuario) => {
     setEditandoId(u.id_usuario)
     setForm({ nome: u.nome, email: u.email, senha: '', perfil: u.perfil })
     setMostrarForm(true)
@@ -34,7 +42,7 @@ function Usuarios() {
     setErro('')
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (enviando) return
     setEnviando(true)
@@ -49,15 +57,16 @@ function Usuarios() {
       setMostrarForm(false)
       setEditandoId(null)
       carregar()
-    } catch (err) {
-      setErro(err.response?.data?.erro || 'Erro ao salvar usuário.')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { erro?: string } } }
+      setErro(error.response?.data?.erro || 'Erro ao salvar usuário.')
     } finally {
       setEnviando(false)
     }
   }
 
-  const handleDeletar = async (id, nome) => {
-    if (id === usuario.id_usuario) {
+  const handleDeletar = async (id: number, nome: string) => {
+    if (id === usuario?.id_usuario) {
       alert('Você não pode remover seu próprio usuário.')
       return
     }
@@ -70,7 +79,6 @@ function Usuarios() {
     }
   }
 
-  // Somente admin pode acessar
   if (usuario?.perfil !== 'admin') {
     return (
       <div style={styles.card}>
@@ -88,7 +96,6 @@ function Usuarios() {
         </button>
       </div>
 
-      {/* Formulário */}
       {mostrarForm && (
         <div style={styles.card}>
           <h3 style={styles.cardTitulo}>{editandoId ? 'Editar Usuário' : 'Novo Usuário'}</h3>
@@ -97,12 +104,12 @@ function Usuarios() {
             <div style={styles.linha}>
               <div style={styles.campo}>
                 <label style={styles.label}>Nome *</label>
-                <input style={styles.input} name="nome" value={form.nome}
+                <input style={styles.input} value={form.nome}
                   onChange={e => setForm({ ...form, nome: e.target.value })} required />
               </div>
               <div style={styles.campo}>
                 <label style={styles.label}>Email *</label>
-                <input style={styles.input} type="email" name="email" value={form.email}
+                <input style={styles.input} type="email" value={form.email}
                   onChange={e => setForm({ ...form, email: e.target.value })} required />
               </div>
             </div>
@@ -111,14 +118,14 @@ function Usuarios() {
                 <label style={styles.label}>
                   {editandoId ? 'Nova senha (deixe em branco para manter)' : 'Senha *'}
                 </label>
-                <input style={styles.input} type="password" name="senha" value={form.senha}
+                <input style={styles.input} type="password" value={form.senha}
                   onChange={e => setForm({ ...form, senha: e.target.value })}
                   required={!editandoId} />
               </div>
               <div style={styles.campo}>
                 <label style={styles.label}>Perfil</label>
                 <select style={styles.input} value={form.perfil}
-                  onChange={e => setForm({ ...form, perfil: e.target.value })}>
+                  onChange={e => setForm({ ...form, perfil: e.target.value as 'admin' | 'operador' })}>
                   <option value="operador">Operador</option>
                   <option value="admin">Administrador</option>
                 </select>
@@ -137,7 +144,6 @@ function Usuarios() {
         </div>
       )}
 
-      {/* Lista */}
       <div style={styles.card}>
         <h3 style={styles.cardTitulo}>Usuários cadastrados</h3>
         {usuarios.length === 0 ? (
@@ -157,7 +163,7 @@ function Usuarios() {
                 <tr key={u.id_usuario} style={styles.tr}>
                   <td style={styles.td}>
                     {u.nome}
-                    {u.id_usuario === usuario.id_usuario && (
+                    {u.id_usuario === usuario?.id_usuario && (
                       <span style={styles.voce}> (você)</span>
                     )}
                   </td>
@@ -175,9 +181,10 @@ function Usuarios() {
                       <button onClick={() => handleEditar(u)} style={styles.botaoEditar}>
                         ✏️ Editar
                       </button>
-                      <button onClick={() => handleDeletar(u.id_usuario, u.nome)}
+                      <button
+                        onClick={() => handleDeletar(u.id_usuario, u.nome)}
                         style={styles.botaoDeletar}
-                        disabled={u.id_usuario === usuario.id_usuario}>
+                        disabled={u.id_usuario === usuario?.id_usuario}>
                         🗑️ Remover
                       </button>
                     </div>
@@ -192,7 +199,7 @@ function Usuarios() {
   )
 }
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   card: { backgroundColor: '#fff', padding: '1.5rem', borderRadius: '8px' },
   cardTitulo: { color: '#1a1a2e', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '2px solid #1a1a2e' },

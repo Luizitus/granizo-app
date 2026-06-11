@@ -1,61 +1,54 @@
-// src/pages/EditarVeiculo.jsx
+// src/pages/NovoVeiculo.tsx
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
+import { Cliente, Marca, Modelo } from '../types'
 
-function EditarVeiculo() {
-  const { id } = useParams()
+interface FormVeiculo {
+  placa: string
+  id_cliente: string
+  id_marca: string
+  id_modelo: string
+  qtde_amassados: number
+  trabalho_a_frio: number
+  pintura: number
+  pecas_para_trocar: string
+  riscos_amassados: string
+  faturar: number
+  data_entrada: string
+}
+
+function NovoVeiculo() {
   const navigate = useNavigate()
-  const [clientes, setClientes] = useState([])
-  const [marcas, setMarcas] = useState([])
-  const [modelos, setModelos] = useState([])
-  const [modelosFiltrados, setModelosFiltrados] = useState([])
-  const [enviando, setEnviando] = useState(false)
-  const [erro, setErro] = useState('')
-  const [carregando, setCarregando] = useState(true)
+  const [clientes, setClientes] = useState<Cliente[]>([])
+  const [marcas, setMarcas] = useState<Marca[]>([])
+  const [modelos, setModelos] = useState<Modelo[]>([])
+  const [modelosFiltrados, setModelosFiltrados] = useState<Modelo[]>([])
+  const [enviando, setEnviando] = useState<boolean>(false)
+  const [erro, setErro] = useState<string>('')
 
-  const [form, setForm] = useState({
-    placa: '', id_cliente: '', id_marca: '', id_modelo: '',
-    qtde_amassados: 0, trabalho_a_frio: 0, pintura: 0,
-    pecas_para_trocar: '', riscos_amassados: '', faturar: 0
+  const [form, setForm] = useState<FormVeiculo>({
+    placa: '',
+    id_cliente: '',
+    id_marca: '',
+    id_modelo: '',
+    qtde_amassados: 0,
+    trabalho_a_frio: 0,
+    pintura: 0,
+    pecas_para_trocar: '',
+    riscos_amassados: '',
+    faturar: 0,
+    data_entrada: new Date().toISOString().split('T')[0]
   })
 
   useEffect(() => {
-    // Carrega dados do veículo, clientes, marcas e modelos ao mesmo tempo
-    Promise.all([
-      api.get(`/veiculos/${id}`),
-      api.get('/clientes'),
-      api.get('/marcas'),
-      api.get('/modelos')
-    ]).then(([veiculoRes, clientesRes, marcasRes, modelosRes]) => {
-      const v = veiculoRes.data
-      setClientes(clientesRes.data)
-      setMarcas(marcasRes.data)
-      setModelos(modelosRes.data)
+    api.get<Cliente[]>('/clientes').then(res => setClientes(res.data))
+    api.get<Marca[]>('/marcas').then(res => setMarcas(res.data))
+    api.get<Modelo[]>('/modelos').then(res => setModelos(res.data))
+  }, [])
 
-      // Filtra modelos da marca do veículo
-      const filtrados = modelosRes.data.filter(m => m.id_marca === v.id_marca)
-      setModelosFiltrados(filtrados)
-
-      // Preenche o formulário com os dados atuais
-      setForm({
-        placa:             v.placa,
-        id_cliente:        v.id_cliente,
-        id_marca:          v.id_marca,
-        id_modelo:         v.id_modelo,
-        qtde_amassados:    v.qtde_amassados,
-        trabalho_a_frio:   v.trabalho_a_frio,
-        pintura:           v.pintura,
-        pecas_para_trocar: v.pecas_para_trocar || '',
-        riscos_amassados:  v.riscos_amassados  || '',
-        faturar:           v.faturar
-      })
-    }).catch(() => navigate('/veiculos'))
-      .finally(() => setCarregando(false))
-  }, [id])
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target
 
     if (name === 'id_marca') {
       const filtrados = modelos.filter(m => m.id_marca === parseInt(value))
@@ -65,6 +58,7 @@ function EditarVeiculo() {
     }
 
     if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked
       setForm({ ...form, [name]: checked ? 1 : 0 })
       return
     }
@@ -72,26 +66,23 @@ function EditarVeiculo() {
     setForm({ ...form, [name]: value })
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (enviando) return
     setEnviando(true)
     setErro('')
     try {
-      await api.put(`/veiculos/${id}`, form)
-      navigate(`/veiculos/${id}`)
+      await api.post('/veiculos', form)
+      navigate('/veiculos')
     } catch (err) {
-      setErro('Erro ao atualizar veículo. Verifique os dados.')
+      setErro('Erro ao cadastrar veículo. Verifique os dados.')
       setEnviando(false)
     }
   }
 
-  if (carregando) return <p>Carregando...</p>
-
   return (
     <div style={styles.container}>
-      <button onClick={() => navigate(`/veiculos/${id}`)} style={styles.botaoVoltar}>← Voltar</button>
-      <h2 style={{ margin: '0.5rem 0 1.5rem' }}>Editar Veículo</h2>
+      <h2 style={{ marginBottom: '1.5rem' }}>Nova Entrada de Veículo</h2>
       {erro && <p style={styles.erro}>{erro}</p>}
 
       <form onSubmit={handleSubmit} style={styles.form}>
@@ -100,14 +91,21 @@ function EditarVeiculo() {
         <div style={styles.linha}>
           <div style={styles.campo}>
             <label style={styles.label}>Placa *</label>
-            <input style={styles.input} name="placa" value={form.placa} onChange={handleChange} required />
+            <input style={styles.input} name="placa" value={form.placa}
+              onChange={handleChange} required placeholder="ABC1234" />
+          </div>
+          <div style={styles.campo}>
+            <label style={styles.label}>Data de entrada *</label>
+            <input style={styles.input} type="date" name="data_entrada"
+              value={form.data_entrada} onChange={handleChange} required />
           </div>
         </div>
 
         <div style={styles.linha}>
           <div style={styles.campo}>
             <label style={styles.label}>Marca *</label>
-            <select style={styles.input} name="id_marca" value={form.id_marca} onChange={handleChange} required>
+            <select style={styles.input} name="id_marca" value={form.id_marca}
+              onChange={handleChange} required>
               <option value="">Selecione a marca</option>
               {marcas.map(m => (
                 <option key={m.id_marca} value={m.id_marca}>{m.marca}</option>
@@ -116,7 +114,8 @@ function EditarVeiculo() {
           </div>
           <div style={styles.campo}>
             <label style={styles.label}>Modelo *</label>
-            <select style={styles.input} name="id_modelo" value={form.id_modelo} onChange={handleChange} required disabled={!form.id_marca}>
+            <select style={styles.input} name="id_modelo" value={form.id_modelo}
+              onChange={handleChange} required disabled={!form.id_marca}>
               <option value="">Selecione o modelo</option>
               {modelosFiltrados.map(m => (
                 <option key={m.id_modelo} value={m.id_modelo}>{m.modelo}</option>
@@ -128,10 +127,13 @@ function EditarVeiculo() {
         <h3 style={styles.secao}>Proprietário</h3>
         <div style={styles.campo}>
           <label style={styles.label}>Cliente *</label>
-          <select style={styles.input} name="id_cliente" value={form.id_cliente} onChange={handleChange} required>
+          <select style={styles.input} name="id_cliente" value={form.id_cliente}
+            onChange={handleChange} required>
             <option value="">Selecione o cliente</option>
             {clientes.map(c => (
-              <option key={c.id_cliente} value={c.id_cliente}>{c.nome} — {c.telefone}</option>
+              <option key={c.id_cliente} value={c.id_cliente}>
+                {c.nome} — {c.telefone}
+              </option>
             ))}
           </select>
         </div>
@@ -146,7 +148,8 @@ function EditarVeiculo() {
           <div style={styles.campo}>
             <label style={styles.label}>Riscos e amassados (descrição)</label>
             <input style={styles.input} name="riscos_amassados"
-              value={form.riscos_amassados} onChange={handleChange} />
+              value={form.riscos_amassados} onChange={handleChange}
+              placeholder="Ex: teto, capô, porta direita" />
           </div>
         </div>
 
@@ -171,11 +174,12 @@ function EditarVeiculo() {
         <div style={styles.campo}>
           <label style={styles.label}>Peças para trocar</label>
           <input style={styles.input} name="pecas_para_trocar"
-            value={form.pecas_para_trocar} onChange={handleChange} />
+            value={form.pecas_para_trocar} onChange={handleChange}
+            placeholder="Ex: para-choque, retrovisor" />
         </div>
 
         <button type="submit" style={styles.botao} disabled={enviando}>
-          {enviando ? 'Salvando...' : 'Salvar Alterações'}
+          {enviando ? 'Salvando...' : 'Registrar Entrada'}
         </button>
 
       </form>
@@ -183,7 +187,7 @@ function EditarVeiculo() {
   )
 }
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: { backgroundColor: '#fff', padding: '2rem', borderRadius: '8px' },
   form: { display: 'flex', flexDirection: 'column' },
   secao: { margin: '1.5rem 0 1rem', color: '#1a1a2e', borderBottom: '2px solid #1a1a2e', paddingBottom: '0.5rem' },
@@ -194,8 +198,7 @@ const styles = {
   checkboxLinha: { display: 'flex', gap: '2rem', marginBottom: '1rem' },
   checkboxLabel: { display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' },
   botao: { backgroundColor: '#1a1a2e', color: '#fff', padding: '0.75rem', border: 'none', borderRadius: '6px', fontSize: '1rem', cursor: 'pointer', marginTop: '1rem' },
-  botaoVoltar: { background: 'none', border: 'none', cursor: 'pointer', color: '#666', fontSize: '0.9rem' },
   erro: { color: 'red', marginBottom: '1rem' }
 }
 
-export default EditarVeiculo
+export default NovoVeiculo
