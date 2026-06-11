@@ -1,29 +1,38 @@
-// src/pages/Tecnicos.jsx
+// src/pages/Tecnicos.tsx
 import { useState, useEffect } from 'react'
 import api from '../services/api'
+import { Tecnico } from '../types'
 
-const formVazio = { nome: '', cidade: '', endereco: '', telefone: '', email: '', iban: '' }
+interface FormTecnico {
+  nome: string
+  cidade: string
+  endereco: string
+  telefone: string
+  email: string
+  iban: string
+}
+
+const formVazio: FormTecnico = { nome: '', cidade: '', endereco: '', telefone: '', email: '', iban: '' }
 
 function Tecnicos() {
-  const [tecnicos, setTecnicos] = useState([])
-  const [form, setForm] = useState(formVazio)
-  const [erro, setErro] = useState('')
-  const [enviando, setEnviando] = useState(false)
-  const [mostrarForm, setMostrarForm] = useState(false)
-  const [editandoId, setEditandoId] = useState(null)
+  const [tecnicos, setTecnicos] = useState<Tecnico[]>([])
+  const [form, setForm] = useState<FormTecnico>(formVazio)
+  const [erro, setErro] = useState<string>('')
+  const [enviando, setEnviando] = useState<boolean>(false)
+  const [mostrarForm, setMostrarForm] = useState<boolean>(false)
+  const [editandoId, setEditandoId] = useState<number | null>(null)
 
   const carregar = () => {
-    api.get('/tecnicos').then(res => setTecnicos(res.data))
+    api.get<Tecnico[]>('/tecnicos').then(res => setTecnicos(res.data))
   }
 
   useEffect(() => { carregar() }, [])
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  // Abre o formulário preenchido com os dados do técnico
-  const handleEditar = (tecnico) => {
+  const handleEditar = (tecnico: Tecnico) => {
     setEditandoId(tecnico.id_tecnico)
     setForm({
       nome:     tecnico.nome     || '',
@@ -44,17 +53,15 @@ function Tecnicos() {
     setErro('')
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (enviando) return
     setEnviando(true)
     setErro('')
     try {
       if (editandoId) {
-        // Edição — usa PUT
         await api.put(`/tecnicos/${editandoId}`, form)
       } else {
-        // Cadastro — usa POST
         await api.post('/tecnicos', form)
       }
       setForm(formVazio)
@@ -77,12 +84,9 @@ function Tecnicos() {
         </button>
       </div>
 
-      {/* Formulário de cadastro/edição */}
       {mostrarForm && (
         <div style={styles.card}>
-          <h3 style={styles.cardTitulo}>
-            {editandoId ? 'Editar Técnico' : 'Novo Técnico'}
-          </h3>
+          <h3 style={styles.cardTitulo}>{editandoId ? 'Editar Técnico' : 'Novo Técnico'}</h3>
           {erro && <p style={styles.erro}>{erro}</p>}
           <form onSubmit={handleSubmit} style={styles.form}>
             <div style={styles.linha}>
@@ -119,8 +123,8 @@ function Tecnicos() {
               <button type="submit" style={styles.botaoPrimario} disabled={enviando}>
                 {enviando ? 'Salvando...' : editandoId ? 'Salvar Alterações' : 'Salvar Técnico'}
               </button>
-              <button type="button" onClick={() => { setMostrarForm(false); setEditandoId(null); setForm(formVazio) }}
-                style={styles.botaoCancelar}>
+              <button type="button" style={styles.botaoCancelar}
+                onClick={() => { setMostrarForm(false); setEditandoId(null); setForm(formVazio) }}>
                 Cancelar
               </button>
             </div>
@@ -128,7 +132,6 @@ function Tecnicos() {
         </div>
       )}
 
-      {/* Lista */}
       <div style={styles.card}>
         <h3 style={styles.cardTitulo}>Técnicos cadastrados</h3>
         {tecnicos.length === 0 ? (
@@ -141,7 +144,7 @@ function Tecnicos() {
                 <th style={styles.th}>Telefone</th>
                 <th style={styles.th}>Email</th>
                 <th style={styles.th}>Cidade</th>
-                <th style={styles.th}>Endereço</th>  {/* linha nova */}
+                <th style={styles.th}>Endereço</th>
                 <th style={styles.th}>IBAN</th>
                 <th style={styles.th}>Ações</th>
               </tr>
@@ -153,7 +156,7 @@ function Tecnicos() {
                   <td style={styles.td}>{t.telefone || '—'}</td>
                   <td style={styles.td}>{t.email || '—'}</td>
                   <td style={styles.td}>{t.cidade || '—'}</td>
-                  <td style={styles.td}>{t.endereco || '—'}</td>  {/* linha nova */}
+                  <td style={styles.td}>{t.endereco || '—'}</td>
                   <td style={styles.td}>{t.iban || '—'}</td>
                   <td style={styles.td}>
                     <button onClick={() => handleEditar(t)} style={styles.botaoEditar}>
@@ -170,11 +173,11 @@ function Tecnicos() {
   )
 }
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   card: { backgroundColor: '#fff', padding: '1.5rem', borderRadius: '8px' },
   cardTitulo: { color: '#1a1a2e', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '2px solid #1a1a2e' },
-  form: { display: 'flex', flexDirection: 'column' },
+  form: { display: 'flex', flexDirection: 'column', gap: '0' },
   linha: { display: 'flex', gap: '1rem', marginBottom: '1rem' },
   campo: { display: 'flex', flexDirection: 'column', flex: 1 },
   label: { marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' },

@@ -1,32 +1,31 @@
-// src/pages/Modelos.jsx
+// src/pages/Marcas.tsx
 import { useState, useEffect } from 'react'
 import api from '../services/api'
+import { Marca } from '../types'
 
-function Modelos() {
-  const [modelos, setModelos] = useState([])
-  const [marcas, setMarcas] = useState([])
-  const [form, setForm] = useState({ modelo: '', id_marca: '' })
-  const [erro, setErro] = useState('')
-  const [enviando, setEnviando] = useState(false)
+function Marcas() {
+  const [marcas, setMarcas] = useState<Marca[]>([])
+  const [novaMarca, setNovaMarca] = useState<string>('')
+  const [erro, setErro] = useState<string>('')
+  const [enviando, setEnviando] = useState<boolean>(false)
 
   const carregar = () => {
-    api.get('/modelos').then(res => setModelos(res.data))
-    api.get('/marcas').then(res => setMarcas(res.data))
+    api.get<Marca[]>('/marcas').then(res => setMarcas(res.data))
   }
 
   useEffect(() => { carregar() }, [])
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (enviando) return
     setEnviando(true)
     setErro('')
     try {
-      await api.post('/modelos', form)
-      setForm({ modelo: '', id_marca: '' })
+      await api.post('/marcas', { marca: novaMarca })
+      setNovaMarca('')
       carregar()
     } catch (err) {
-      setErro('Erro ao cadastrar modelo.')
+      setErro('Erro ao cadastrar marca.')
     } finally {
       setEnviando(false)
     }
@@ -34,29 +33,17 @@ function Modelos() {
 
   return (
     <div style={styles.container}>
-      <h2 style={{ marginBottom: '1.5rem' }}>Modelos</h2>
+      <h2 style={{ marginBottom: '1.5rem' }}>Marcas</h2>
 
-      {/* Formulário */}
       <div style={styles.card}>
-        <h3 style={styles.cardTitulo}>Novo Modelo</h3>
+        <h3 style={styles.cardTitulo}>Nova Marca</h3>
         {erro && <p style={styles.erro}>{erro}</p>}
         <form onSubmit={handleSubmit} style={styles.form}>
-          <select
-            style={styles.input}
-            value={form.id_marca}
-            onChange={e => setForm({ ...form, id_marca: e.target.value })}
-            required
-          >
-            <option value="">Selecione a marca</option>
-            {marcas.map(m => (
-              <option key={m.id_marca} value={m.id_marca}>{m.marca}</option>
-            ))}
-          </select>
           <input
             style={styles.input}
-            value={form.modelo}
-            onChange={e => setForm({ ...form, modelo: e.target.value })}
-            placeholder="Ex: Gol"
+            value={novaMarca}
+            onChange={e => setNovaMarca(e.target.value)}
+            placeholder="Ex: Volkswagen"
             required
           />
           <button type="submit" style={styles.botao} disabled={enviando}>
@@ -65,26 +52,23 @@ function Modelos() {
         </form>
       </div>
 
-      {/* Lista */}
       <div style={styles.card}>
-        <h3 style={styles.cardTitulo}>Modelos cadastrados</h3>
-        {modelos.length === 0 ? (
-          <p>Nenhum modelo cadastrado ainda.</p>
+        <h3 style={styles.cardTitulo}>Marcas cadastradas</h3>
+        {marcas.length === 0 ? (
+          <p>Nenhuma marca cadastrada ainda.</p>
         ) : (
           <table style={styles.tabela}>
             <thead>
               <tr>
                 <th style={styles.th}>#</th>
-                <th style={styles.th}>Modelo</th>
                 <th style={styles.th}>Marca</th>
               </tr>
             </thead>
             <tbody>
-              {modelos.map(m => (
-                <tr key={m.id_modelo} style={styles.tr}>
-                  <td style={styles.td}>{m.id_modelo}</td>
-                  <td style={styles.td}>{m.modelo}</td>
-                  <td style={styles.td}>{m.nome_marca}</td>
+              {marcas.map(m => (
+                <tr key={m.id_marca} style={styles.tr}>
+                  <td style={styles.td}>{m.id_marca}</td>
+                  <td style={styles.td}>{m.marca}</td>
                 </tr>
               ))}
             </tbody>
@@ -95,7 +79,7 @@ function Modelos() {
   )
 }
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: { display: 'flex', flexDirection: 'column', gap: '1rem' },
   card: { backgroundColor: '#fff', padding: '1.5rem', borderRadius: '8px' },
   cardTitulo: { color: '#1a1a2e', marginBottom: '1rem', paddingBottom: '0.5rem', borderBottom: '2px solid #1a1a2e' },
@@ -109,4 +93,4 @@ const styles = {
   erro: { color: 'red', marginBottom: '1rem' }
 }
 
-export default Modelos
+export default Marcas

@@ -1,23 +1,34 @@
-// src/pages/Login.jsx
+// src/pages/Login.tsx
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../services/api'
+import { Usuario } from '../types'
+
+interface FormLogin {
+  email: string
+  senha: string
+}
+
+interface LoginResponse {
+  token: string
+  usuario: Usuario
+}
 
 function Login() {
   const navigate = useNavigate()
   const { login } = useAuth()
-  const [form, setForm] = useState({ email: '', senha: '' })
-  const [erro, setErro] = useState('')
-  const [carregando, setCarregando] = useState(false)
+  const [form, setForm] = useState<FormLogin>({ email: '', senha: '' })
+  const [erro, setErro] = useState<string>('')
+  const [carregando, setCarregando] = useState<boolean>(false)
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (carregando) return
     setCarregando(true)
     setErro('')
     try {
-      const res = await api.post('/auth/login', form)
+      const res = await api.post<LoginResponse>('/auth/login', form)
       login(res.data.usuario, res.data.token)
       navigate('/')
     } catch (err) {
@@ -66,22 +77,9 @@ function Login() {
   )
 }
 
-const styles = {
-  pagina: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f0f2f5'
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: '12px',
-    padding: '2.5rem',
-    width: '100%',
-    maxWidth: '400px',
-    boxShadow: '0 4px 24px rgba(0,0,0,0.08)'
-  },
+const styles: Record<string, React.CSSProperties> = {
+  pagina: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f0f2f5' },
+  card: { backgroundColor: '#fff', borderRadius: '12px', padding: '2.5rem', width: '100%', maxWidth: '400px', boxShadow: '0 4px 24px rgba(0,0,0,0.08)' },
   topo: { textAlign: 'center', marginBottom: '2rem' },
   titulo: { fontSize: '1.8rem', color: '#1a1a2e', marginBottom: '0.5rem' },
   subtitulo: { color: '#666', fontSize: '0.95rem' },

@@ -1,4 +1,4 @@
-// src/App.jsx
+// src/App.tsx
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import RotaProtegida from './components/RotaProtegida'
@@ -14,9 +14,8 @@ import Marcas from './pages/Marcas'
 import Modelos from './pages/Modelos'
 import Tecnicos from './pages/Tecnicos'
 import Relatorios from './pages/Relatorios'
-import { useAuth } from './context/AuthContext'
 import Usuarios from './pages/Usuarios'
-
+import { useAuth } from './context/AuthContext'
 
 function App() {
   const { usuario } = useAuth()

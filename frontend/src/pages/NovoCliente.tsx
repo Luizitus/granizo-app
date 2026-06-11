@@ -1,25 +1,33 @@
-// src/pages/NovoCliente.jsx
+// src/pages/NovoCliente.tsx
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 
+interface FormCliente {
+  nome: string
+  telefone: string
+  cidade: string
+  endereco: string
+  contato: string
+  tipo_contato: string
+}
+
 function NovoCliente() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormCliente>({
     nome: '', telefone: '', cidade: '',
     endereco: '', contato: '', tipo_contato: ''
   })
-  const [erro, setErro] = useState('')
-  const [enviando, setEnviando] = useState(false)  // controle de envio
+  const [erro, setErro] = useState<string>('')
+  const [enviando, setEnviando] = useState<boolean>(false)
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('handleSubmit chamado')  // adiciona essa linha
-    if (enviando) return   // bloqueia segundo clique
+    if (enviando) return
     setEnviando(true)
     setErro('')
     try {
@@ -27,7 +35,7 @@ function NovoCliente() {
       navigate('/clientes')
     } catch (err) {
       setErro('Erro ao cadastrar cliente. Verifique os dados.')
-      setEnviando(false)  // libera só se der erro
+      setEnviando(false)
     }
   }
 
@@ -48,7 +56,7 @@ function NovoCliente() {
         <label style={styles.label}>Endereço</label>
         <input style={styles.input} name="endereco" value={form.endereco} onChange={handleChange} />
 
-        <label style={styles.label}>Contato (email ou outro)</label>
+        <label style={styles.label}>Contato</label>
         <input style={styles.input} name="contato" value={form.contato} onChange={handleChange} />
 
         <label style={styles.label}>Tipo de contato</label>
@@ -67,7 +75,7 @@ function NovoCliente() {
   )
 }
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   container: { backgroundColor: '#fff', padding: '2rem', borderRadius: '8px' },
   form: { display: 'flex', flexDirection: 'column', maxWidth: '500px' },
   label: { marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' },

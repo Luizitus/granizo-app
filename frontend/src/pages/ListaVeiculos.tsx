@@ -1,9 +1,10 @@
-// src/pages/ListaVeiculos.jsx
+// src/pages/ListaVeiculos.tsx
 import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import api from '../services/api'
+import { Veiculo, StatusVeiculo } from '../types'
 
-const cores = {
+const cores: Record<StatusVeiculo, string> = {
   em_analise:      '#f6ad55',
   em_servico:      '#63b3ed',
   aguardando_peca: '#fc8181',
@@ -21,14 +22,14 @@ const statusOpcoes = [
 ]
 
 function ListaVeiculos() {
-  const [veiculos, setVeiculos] = useState([])
-  const [busca, setBusca] = useState('')
-  const [filtroStatus, setFiltroStatus] = useState('')
-  const [carregando, setCarregando] = useState(true)
+  const [veiculos, setVeiculos] = useState<Veiculo[]>([])
+  const [busca, setBusca] = useState<string>('')
+  const [filtroStatus, setFiltroStatus] = useState<string>('')
+  const [carregando, setCarregando] = useState<boolean>(true)
   const navigate = useNavigate()
 
   useEffect(() => {
-    api.get('/veiculos')
+    api.get<Veiculo[]>('/veiculos')
       .then(res => setVeiculos(res.data))
       .catch(err => console.error(err))
       .finally(() => setCarregando(false))
@@ -37,8 +38,8 @@ function ListaVeiculos() {
   const veiculosFiltrados = veiculos.filter(v => {
     const buscaOk = (
       v.placa.toLowerCase().includes(busca.toLowerCase()) ||
-      v.cliente_nome.toLowerCase().includes(busca.toLowerCase()) ||
-      v.modelo_nome.toLowerCase().includes(busca.toLowerCase())
+      (v.cliente_nome?.toLowerCase().includes(busca.toLowerCase()) ?? false) ||
+      (v.modelo_nome?.toLowerCase().includes(busca.toLowerCase()) ?? false)
     )
     const statusOk = filtroStatus === '' || v.status === filtroStatus
     return buscaOk && statusOk
@@ -53,7 +54,6 @@ function ListaVeiculos() {
         <Link to="/veiculos/novo" style={styles.botao}>+ Nova Entrada</Link>
       </div>
 
-      {/* Barra de busca e filtro */}
       <div style={styles.barraBusca}>
         <input
           style={styles.busca}
@@ -69,10 +69,10 @@ function ListaVeiculos() {
               style={{
                 ...styles.filtroBotao,
                 backgroundColor: filtroStatus === s.valor
-                  ? (cores[s.valor] || '#1a1a2e')
+                  ? (cores[s.valor as StatusVeiculo] || '#1a1a2e')
                   : '#fff',
                 color: filtroStatus === s.valor ? '#fff' : '#333',
-                borderColor: cores[s.valor] || '#1a1a2e',
+                borderColor: cores[s.valor as StatusVeiculo] || '#1a1a2e',
               }}
             >
               {s.label}
@@ -83,7 +83,7 @@ function ListaVeiculos() {
 
       {veiculosFiltrados.length === 0 ? (
         <p style={{ color: '#999', marginTop: '1rem' }}>
-          {busca || filtroStatus ? 'Nenhum veículo encontrado para esse filtro.' : 'Nenhum veículo cadastrado ainda.'}
+          {busca || filtroStatus ? 'Nenhum veículo encontrado.' : 'Nenhum veículo cadastrado ainda.'}
         </p>
       ) : (
         <table style={styles.tabela}>
@@ -101,8 +101,8 @@ function ListaVeiculos() {
             {veiculosFiltrados.map(v => (
               <tr key={v.id_veiculo} style={styles.tr}
                 onClick={() => navigate(`/veiculos/${v.id_veiculo}`)}
-                onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f7fafc'}
-                onMouseLeave={e => e.currentTarget.style.backgroundColor = ''}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f7fafc')}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}
               >
                 <td style={styles.td}>{v.placa}</td>
                 <td style={styles.td}>{v.modelo_nome}</td>
@@ -120,7 +120,6 @@ function ListaVeiculos() {
         </table>
       )}
 
-      {/* Contador de resultados */}
       {(busca || filtroStatus) && (
         <p style={{ color: '#666', marginTop: '0.75rem', fontSize: '0.9rem' }}>
           {veiculosFiltrados.length} resultado(s) encontrado(s)
@@ -130,7 +129,7 @@ function ListaVeiculos() {
   )
 }
 
-const styles = {
+const styles: Record<string, React.CSSProperties> = {
   barraBusca: { display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem' },
   busca: { width: '100%', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e0', fontSize: '1rem', boxSizing: 'border-box' },
   filtroStatus: { display: 'flex', gap: '0.5rem', flexWrap: 'wrap' },
