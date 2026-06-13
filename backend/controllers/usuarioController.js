@@ -1,68 +1,70 @@
 // backend/controllers/usuarioController.js
-const db = require('../database')
+const { query, execute, isPg } = require('../db')
 const bcrypt = require('bcryptjs')
 
-const listar = (req, res) => {
-  const usuarios = db.prepare(`
-    SELECT id_usuario, nome, email, perfil FROM usuarios
-  `).all()
-  res.json(usuarios)
+const listar = async (req, res) => {
+  try {
+    const usuarios = await query('SELECT id_usuario, nome, email, perfil FROM usuarios')
+    res.json(usuarios)
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao listar usuários.' })
+  }
 }
 
-const cadastrar = (req, res) => {
+const cadastrar = async (req, res) => {
   const { nome, email, senha, perfil } = req.body
 
   if (!nome || !email || !senha) {
     return res.status(400).json({ erro: 'Nome, email e senha são obrigatórios.' })
   }
 
-  const existe = db.prepare('SELECT id_usuario FROM usuarios WHERE email = ?').get(email)
-  if (existe) {
-    return res.status(409).json({ erro: 'Email já cadastrado.' })
+  try {
+    const existe = await query('SELECT id_usuario FROM usuarios WHERE email = ?', [email])
+    if (existe.length > 0) return res.status(409).json({ erro: 'Email já cadastrado.' })
+
+    const senhaCriptografada = bcrypt.hashSync(senha, 10)
+
+    const sql = isPg
+      ? `INSERT INTO usuarios (nome, email, senha, perfil) VALUES (?, ?, ?, ?) RETURNING id_usuario`
+      : `INSERT INTO usuarios (nome, email, senha, perfil) VALUES (?, ?, ?, ?)`
+
+    const result = await execute(sql, [nome, email, senhaCriptografada, perfil || 'operador'])
+    res.status(201).json({ id_usuario: result.lastInsertRowid, nome, email, perfil: perfil || 'operador' })
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao cadastrar usuário.' })
   }
-
-  const senhaCriptografada = bcrypt.hashSync(senha, 10)
-
-  const result = db.prepare(`
-    INSERT INTO usuarios (nome, email, senha, perfil)
-    VALUES (?, ?, ?, ?)
-  `).run(nome, email, senhaCriptografada, perfil || 'operador')
-
-  res.status(201).json({ id_usuario: result.lastInsertRowid, nome, email, perfil: perfil || 'operador' })
 }
 
-const atualizar = (req, res) => {
+const atualizar = async (req, res) => {
   const { nome, email, perfil, senha } = req.body
 
-  if (!nome || !email) {
-    return res.status(400).json({ erro: 'Nome e email são obrigatórios.' })
-  }
+  if (!nome || !email) return res.status(400).json({ erro: 'Nome e email são obrigatórios.' })
 
-  // Se enviou nova senha, criptografa — senão mantém a atual
-  if (senha) {
-    const senhaCriptografada = bcrypt.hashSync(senha, 10)
-    db.prepare(`
-      UPDATE usuarios SET nome = ?, email = ?, perfil = ?, senha = ?
-      WHERE id_usuario = ?
-    `).run(nome, email, perfil || 'operador', senhaCriptografada, req.params.id)
-  } else {
-    db.prepare(`
-      UPDATE usuarios SET nome = ?, email = ?, perfil = ?
-      WHERE id_usuario = ?
-    `).run(nome, email, perfil || 'operador', req.params.id)
+  try {
+    if (senha) {
+      const senhaCriptografada = bcrypt.hashSync(senha, 10)
+      await execute(`
+        UPDATE usuarios SET nome = ?, email = ?, perfil = ?, senha = ? WHERE id_usuario = ?
+      `, [nome, email, perfil || 'operador', senhaCriptografada, req.params.id])
+    } else {
+      await execute(`
+        UPDATE usuarios SET nome = ?, email = ?, perfil = ? WHERE id_usuario = ?
+      `, [nome, email, perfil || 'operador', req.params.id])
+    }
+    res.json({ mensagem: 'Usuário atualizado com sucesso.' })
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao atualizar usuário.' })
   }
-
-  res.json({ mensagem: 'Usuário atualizado com sucesso.' })
 }
 
-const deletar = (req, res) => {
-  const result = db.prepare('DELETE FROM usuarios WHERE id_usuario = ?').run(req.params.id)
-
-  if (result.changes === 0) {
-    return res.status(404).json({ erro: 'Usuário não encontrado.' })
+const deletar = async (req, res) => {
+  try {
+    const result = await execute('DELETE FROM usuarios WHERE id_usuario = ?', [req.params.id])
+    if (result.changes === 0) return res.status(404).json({ erro: 'Usuário não encontrado.' })
+    res.json({ mensagem: 'Usuário removido com sucesso.' })
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao remover usuário.' })
   }
-
-  res.json({ mensagem: 'Usuário removido com sucesso.' })
 }
 
 module.exports = { listar, cadastrar, atualizar, deletar }

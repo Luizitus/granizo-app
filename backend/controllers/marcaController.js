@@ -1,20 +1,30 @@
-const db = require('../database');
+// backend/controllers/marcaController.js
+const { query, execute, isPg } = require('../db')
 
-const listar = (req, res) => {
-    const marcas = db.prepare('SELECT * FROM marca').all();
-    res.json(marcas);
+const listar = async (req, res) => {
+  try {
+    const marcas = await query('SELECT * FROM marca')
+    res.json(marcas)
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao listar marcas.' })
+  }
 }
 
-const cadastrar = (req, res) => {
-    const {marca} = req.body;
-        if (!marca) {
-            return res.status(400).json({error: 'Marca é obrigatorio'});
-        }
-    const result = db.prepare('INSERT INTO marca (marca) VALUES (?)').run(marca);
-    res.status(201).json({id_marca: result.lastInsertRowid, marca});
-};
+const cadastrar = async (req, res) => {
+  const { marca } = req.body
 
-module.exports = {
-    listar,
-    cadastrar
+  if (!marca) return res.status(400).json({ erro: 'Nome da marca é obrigatório.' })
+
+  try {
+    const sql = isPg
+      ? 'INSERT INTO marca (marca) VALUES (?) RETURNING id_marca'
+      : 'INSERT INTO marca (marca) VALUES (?)'
+
+    const result = await execute(sql, [marca])
+    res.status(201).json({ id_marca: result.lastInsertRowid, marca })
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao cadastrar marca.' })
+  }
 }
+
+module.exports = { listar, cadastrar }
