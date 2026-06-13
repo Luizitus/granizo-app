@@ -223,10 +223,10 @@ const graficos = async (req, res) => {
     ])
 
     res.json({
-      porStatus,
-      porMes,
-      porMarca,
-      tempoMedio: tempoMedio?.media_dias || 0
+      porStatus: porStatus.map(s => ({ ...s, total: Number(s.total) })),
+      porMes: porMes.map(m => ({ ...m, total: Number(m.total) })),
+      porMarca: porMarca.map(m => ({ ...m, total: Number(m.total) })),
+      tempoMedio: Number(tempoMedio?.media_dias) || 0
     })
   } catch (err) {
     res.status(500).json({ erro: 'Erro ao buscar gráficos.' })
