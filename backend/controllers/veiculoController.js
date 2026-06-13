@@ -190,18 +190,19 @@ const graficos = async (req, res) => {
   try {
     const [porStatus, porMes, porMarca, tempoMedio] = await Promise.all([
       query(`SELECT status, COUNT(*) as total FROM veiculo GROUP BY status`),
-      query(`
-        SELECT
-          ${isPg
-            ? "TO_CHAR(data_entrada::date, 'YYYY-MM') as mes"
-            : "strftime('%Y-%m', data_entrada) as mes"
-          },
-          COUNT(*) as total
-        FROM veiculo
-        WHERE data_entrada >= ${isPg ? "NOW() - INTERVAL '6 months'" : "date('now', '-6 months')"}
-        GROUP BY mes
-        ORDER BY mes ASC
-      `),
+      query(
+        isPg
+          ? `SELECT TO_CHAR(data_entrada::date, 'YYYY-MM') as mes, COUNT(*) as total
+             FROM veiculo
+             WHERE data_entrada::date >= (NOW() - INTERVAL '6 months')::date
+             GROUP BY mes
+             ORDER BY mes ASC`
+          : `SELECT strftime('%Y-%m', data_entrada) as mes, COUNT(*) as total
+             FROM veiculo
+             WHERE data_entrada >= date('now', '-6 months')
+             GROUP BY mes
+             ORDER BY mes ASC`
+      ),
       query(`
         SELECT ma.marca, COUNT(*) as total
         FROM veiculo v
