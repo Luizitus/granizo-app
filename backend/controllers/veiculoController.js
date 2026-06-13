@@ -210,16 +210,15 @@ const graficos = async (req, res) => {
         ORDER BY total DESC
         LIMIT 5
       `),
-      queryOne(`
-        SELECT ROUND(AVG(
-          ${isPg
-            ? "EXTRACT(EPOCH FROM (data_entrega::date - data_entrada::date)) / 86400"
-            : "julianday(data_entrega) - julianday(data_entrada)"
-          }
-        )::numeric, 1) as media_dias
-        FROM veiculo
-        WHERE status = 'entregue' AND data_entrega IS NOT NULL
-      `)
+      queryOne(
+        isPg
+          ? `SELECT ROUND(AVG(data_entrega::date - data_entrada::date)::numeric, 1) as media_dias
+             FROM veiculo
+             WHERE status = 'entregue' AND data_entrega IS NOT NULL`
+          : `SELECT ROUND(AVG(julianday(data_entrega) - julianday(data_entrada)), 1) as media_dias
+             FROM veiculo
+             WHERE status = 'entregue' AND data_entrega IS NOT NULL`
+      )
     ])
 
     res.json({
