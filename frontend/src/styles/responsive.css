@@ -1,0 +1,131 @@
+/* src/styles/responsive.css */
+
+/* Breakpoint mobile: até 768px */
+@media (max-width: 768px) {
+    /* Container principal */
+    .container-principal {
+      padding: 0 0.75rem !important;
+      margin: 1rem auto !important;
+    }
+
+    /* Grids que viram 1 coluna */
+    .grid-responsivo {
+      grid-template-columns: 1fr !important;
+    }
+
+    .grid-2-responsivo {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Linhas de formulário viram coluna */
+    .linha-form-responsiva {
+      flex-direction: column !important;
+      gap: 0.75rem !important;
+    }
+
+    /* Tabelas com scroll horizontal */
+    .tabela-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tabela-wrapper table {
+      min-width: 600px;
+    }
+
+    /* Checkbox em coluna no mobile */
+    .checkbox-linha-responsiva {
+      flex-direction: column !important;
+      gap: 0.75rem !important;
+      align-items: flex-start !important;
+    }
+
+    /* Botões de ações que ficam em coluna */
+    .acoes-responsivas {
+      grid-template-columns: 1fr 1fr !important;
+    }
+
+    /* Filtros de relatório em coluna */
+    .filtros-responsivos {
+      flex-direction: column !important;
+    }
+
+    /* Upload area em coluna */
+    .upload-area-responsiva {
+      flex-direction: column !important;
+      align-items: stretch !important;
+    }
+
+    /* Cabeçalho de detalhe do veículo */
+    .cabecalho-detalhe-responsivo {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 1rem !important;
+    }
+
+    .cabecalho-detalhe-acoes {
+      width: 100%;
+      justify-content: space-between !important;
+    }
+
+    /* Fotos menores no mobile */
+    .foto-veiculo {
+      width: 100px !important;
+      height: 100px !important;
+    }
+
+    .cabecalho-card-responsivo {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 0.75rem !important;
+    }
+
+    .cabecalho-card-responsivo > div {
+      width: 100%;
+    }
+
+    .cabecalho-card-responsivo button {
+      flex: 1;
+    }
+  }
+
+  /* Tablets: até 1024px */
+  @media (max-width: 1024px) {
+    .grid-3-responsivo {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+  @media (max-width: 900px) {
+    .navbar-botao-menu {
+      display: block !important;
+    }
+
+    .navbar-links {
+      display: none !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      width: 100%;
+      gap: 1rem !important;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #2d2d44;
+    }
+
+    .navbar-links.aberto {
+      display: flex !important;
+    }
+
+    .navbar-user-mobile {
+      display: flex !important;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+      width: 100%;
+      padding-top: 0.75rem;
+      border-top: 1px solid #2d2d44;
+    }
+
+    .navbar-user-desktop {
+      display: none !important;
+    }
+  }

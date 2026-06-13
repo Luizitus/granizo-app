@@ -118,12 +118,12 @@ function DetalheVeiculo() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div className="cabecalho-detalhe-responsivo" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
           <button onClick={() => navigate('/veiculos')} style={styles.botaoVoltar}>← Voltar</button>
           <h2 style={{ marginTop: '0.5rem' }}>Veículo {veiculo.placa}</h2>
         </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div className="cabecalho-detalhe-acoes" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <button onClick={() => navigate(`/veiculos/${id}/editar`)} style={styles.botaoEditar}>
             ✏️ Editar dados
           </button>
@@ -133,7 +133,7 @@ function DetalheVeiculo() {
         </div>
       </div>
 
-      <div style={styles.grid}>
+      <div className="grid-responsivo" style={styles.grid}>
 
         <div style={styles.card}>
           <h3 style={styles.cardTitulo}>Dados do Veículo</h3>
@@ -180,7 +180,7 @@ function DetalheVeiculo() {
 
         <div style={{ ...styles.card, gridColumn: '1 / -1' }}>
           <h3 style={styles.cardTitulo}>Técnico Responsável</h3>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div className="linha-form-responsiva" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
             <select style={{ ...styles.select, marginBottom: 0, flex: 1 }}
               value={tecnicoSelecionado}
               onChange={e => setTecnicoSelecionado(e.target.value)}>
@@ -202,7 +202,7 @@ function DetalheVeiculo() {
 
         <div style={{ ...styles.card, gridColumn: '1 / -1' }}>
           <h3 style={styles.cardTitulo}>Fotos</h3>
-          <div style={styles.uploadArea}>
+          <div className="upload-area-responsiva" style={styles.uploadArea}>
             <input id="inputFoto" type="file" accept="image/*"
               onChange={e => setFotoSelecionada(e.target.files?.[0] || null)} style={{ flex: 1 }} />
             <select style={{ ...styles.select, width: 'auto', marginBottom: 0 }}
@@ -225,7 +225,7 @@ function DetalheVeiculo() {
               <div style={styles.galeria}>
                 {fotosEntrada.map(f => (
                   <a key={f.id_foto} href={`${apiUrl}/uploads/${f.caminho}`} target="_blank" rel="noreferrer">
-                    <img src={`${apiUrl}/uploads/${f.caminho}`} alt="Foto de entrada" style={styles.foto} />
+                    <img src={`${apiUrl}/uploads/${f.caminho}`} alt="Foto de entrada" className="foto-veiculo" style={styles.foto} />
                   </a>
                 ))}
               </div>
@@ -237,7 +237,7 @@ function DetalheVeiculo() {
               <div style={styles.galeria}>
                 {fotosSaida.map(f => (
                   <a key={f.id_foto} href={`${apiUrl}/uploads/${f.caminho}`} target="_blank" rel="noreferrer">
-                    <img src={`${apiUrl}/uploads/${f.caminho}`} alt="Foto de saída" style={styles.foto} />
+                    <img src={`${apiUrl}/uploads/${f.caminho}`} alt="Foto de saída" className="foto-veiculo" style={styles.foto} />
                   </a>
                 ))}
               </div>

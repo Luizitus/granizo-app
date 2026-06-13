@@ -88,7 +88,7 @@ function NovoVeiculo() {
       <form onSubmit={handleSubmit} style={styles.form}>
 
         <h3 style={styles.secao}>Dados do Veículo</h3>
-        <div style={styles.linha}>
+        <div className="linha-form-responsiva"  style={styles.linha}>
           <div style={styles.campo}>
             <label style={styles.label}>Placa *</label>
             <input style={styles.input} name="placa" value={form.placa}
@@ -101,7 +101,7 @@ function NovoVeiculo() {
           </div>
         </div>
 
-        <div style={styles.linha}>
+        <div className="linha-form-responsiva"  style={styles.linha}>
           <div style={styles.campo}>
             <label style={styles.label}>Marca *</label>
             <select style={styles.input} name="id_marca" value={form.id_marca}
@@ -139,7 +139,7 @@ function NovoVeiculo() {
         </div>
 
         <h3 style={styles.secao}>Avaliação do Serviço</h3>
-        <div style={styles.linha}>
+        <div className="linha-form-responsiva"  style={styles.linha}>
           <div style={styles.campo}>
             <label style={styles.label}>Quantidade de amassados</label>
             <input style={styles.input} type="number" name="qtde_amassados"
@@ -153,7 +153,7 @@ function NovoVeiculo() {
           </div>
         </div>
 
-        <div style={styles.checkboxLinha}>
+        <div className="checkbox-linha-responsiva" style={styles.checkboxLinha}>
           <label style={styles.checkboxLabel}>
             <input type="checkbox" name="trabalho_a_frio"
               checked={form.trabalho_a_frio === 1} onChange={handleChange} />

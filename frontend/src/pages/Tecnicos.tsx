@@ -89,7 +89,7 @@ function Tecnicos() {
           <h3 style={styles.cardTitulo}>{editandoId ? 'Editar Técnico' : 'Novo Técnico'}</h3>
           {erro && <p style={styles.erro}>{erro}</p>}
           <form onSubmit={handleSubmit} style={styles.form}>
-            <div style={styles.linha}>
+            <div className="linha-form-responsiva" style={styles.linha}>
               <div style={styles.campo}>
                 <label style={styles.label}>Nome *</label>
                 <input style={styles.input} name="nome" value={form.nome} onChange={handleChange} required />
@@ -99,7 +99,7 @@ function Tecnicos() {
                 <input style={styles.input} name="telefone" value={form.telefone} onChange={handleChange} />
               </div>
             </div>
-            <div style={styles.linha}>
+            <div className="linha-form-responsiva" style={styles.linha}>
               <div style={styles.campo}>
                 <label style={styles.label}>Email</label>
                 <input style={styles.input} name="email" type="email" value={form.email} onChange={handleChange} />
@@ -109,7 +109,7 @@ function Tecnicos() {
                 <input style={styles.input} name="cidade" value={form.cidade} onChange={handleChange} />
               </div>
             </div>
-            <div style={styles.linha}>
+            <div className="linha-form-responsiva" style={styles.linha}>
               <div style={styles.campo}>
                 <label style={styles.label}>Endereço</label>
                 <input style={styles.input} name="endereco" value={form.endereco} onChange={handleChange} />
@@ -137,36 +137,38 @@ function Tecnicos() {
         {tecnicos.length === 0 ? (
           <p style={{ color: '#999' }}>Nenhum técnico cadastrado ainda.</p>
         ) : (
-          <table style={styles.tabela}>
-            <thead>
-              <tr>
-                <th style={styles.th}>Nome</th>
-                <th style={styles.th}>Telefone</th>
-                <th style={styles.th}>Email</th>
-                <th style={styles.th}>Cidade</th>
-                <th style={styles.th}>Endereço</th>
-                <th style={styles.th}>IBAN</th>
-                <th style={styles.th}>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tecnicos.map(t => (
-                <tr key={t.id_tecnico} style={styles.tr}>
-                  <td style={styles.td}>{t.nome}</td>
-                  <td style={styles.td}>{t.telefone || '—'}</td>
-                  <td style={styles.td}>{t.email || '—'}</td>
-                  <td style={styles.td}>{t.cidade || '—'}</td>
-                  <td style={styles.td}>{t.endereco || '—'}</td>
-                  <td style={styles.td}>{t.iban || '—'}</td>
-                  <td style={styles.td}>
-                    <button onClick={() => handleEditar(t)} style={styles.botaoEditar}>
-                      ✏️ Editar
-                    </button>
-                  </td>
+          <div className="tabela-wrapper">
+            <table style={styles.tabela}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>Nome</th>
+                  <th style={styles.th}>Telefone</th>
+                  <th style={styles.th}>Email</th>
+                  <th style={styles.th}>Cidade</th>
+                  <th style={styles.th}>Endereço</th>
+                  <th style={styles.th}>IBAN</th>
+                  <th style={styles.th}>Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {tecnicos.map(t => (
+                  <tr key={t.id_tecnico} style={styles.tr}>
+                    <td style={styles.td}>{t.nome}</td>
+                    <td style={styles.td}>{t.telefone || '—'}</td>
+                    <td style={styles.td}>{t.email || '—'}</td>
+                    <td style={styles.td}>{t.cidade || '—'}</td>
+                    <td style={styles.td}>{t.endereco || '—'}</td>
+                    <td style={styles.td}>{t.iban || '—'}</td>
+                    <td style={styles.td}>
+                      <button onClick={() => handleEditar(t)} style={styles.botaoEditar}>
+                        ✏️ Editar
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

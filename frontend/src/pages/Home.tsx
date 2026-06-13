@@ -78,8 +78,8 @@ function Home() {
       <p style={{ color: '#666', marginBottom: '2rem' }}>Visão geral do sistema</p>
 
       {/* Cards de resumo */}
-      <div style={styles.grid}>
-        {cards.map(card => (
+      <div className="grid-responsivo grid-3-responsivo" style={styles.grid}>
+      {cards.map(card => (
           <div
             key={card.label}
             style={{ ...styles.card, borderTop: `4px solid ${card.cor}` }}
@@ -96,7 +96,7 @@ function Home() {
       {/* Ações rápidas */}
       <div style={{ ...styles.cardGrafico, marginBottom: '1rem' }}>
         <h3 style={styles.tituloGrafico}>Ações rápidas</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
+        <div className="acoes-responsivas" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
           <button onClick={() => navigate('/veiculos/novo')} style={styles.botao}>🚗 Nova entrada de veículo</button>
           <button onClick={() => navigate('/clientes/novo')} style={styles.botao}>👤 Novo cliente</button>
           <button onClick={() => navigate('/marcas')} style={styles.botao}>🏷️ Gerenciar marcas</button>
@@ -105,7 +105,7 @@ function Home() {
       </div>
 
       {/* Gráficos */}
-      <div style={styles.gridGraficos}>
+      <div className="grid-2-responsivo" style={styles.gridGraficos}>
 
         <div style={styles.cardGrafico}>
           <h3 style={styles.tituloGrafico}>Veículos por status</h3>

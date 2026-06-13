@@ -38,7 +38,7 @@ function Marcas() {
       <div style={styles.card}>
         <h3 style={styles.cardTitulo}>Nova Marca</h3>
         {erro && <p style={styles.erro}>{erro}</p>}
-        <form onSubmit={handleSubmit} style={styles.form}>
+        <form onSubmit={handleSubmit} className="linha-form-responsiva" style={styles.form}>
           <input
             style={styles.input}
             value={novaMarca}
@@ -57,22 +57,24 @@ function Marcas() {
         {marcas.length === 0 ? (
           <p>Nenhuma marca cadastrada ainda.</p>
         ) : (
-          <table style={styles.tabela}>
-            <thead>
-              <tr>
-                <th style={styles.th}>#</th>
-                <th style={styles.th}>Marca</th>
-              </tr>
-            </thead>
-            <tbody>
-              {marcas.map(m => (
-                <tr key={m.id_marca} style={styles.tr}>
-                  <td style={styles.td}>{m.id_marca}</td>
-                  <td style={styles.td}>{m.marca}</td>
+          <div className="tabela-wrapper">
+            <table style={styles.tabela}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>#</th>
+                  <th style={styles.th}>Marca</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {marcas.map(m => (
+                  <tr key={m.id_marca} style={styles.tr}>
+                    <td style={styles.td}>{m.id_marca}</td>
+                    <td style={styles.td}>{m.marca}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

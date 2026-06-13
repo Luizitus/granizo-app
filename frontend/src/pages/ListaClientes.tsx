@@ -43,26 +43,28 @@ function ListaClientes() {
           {busca ? 'Nenhum cliente encontrado.' : 'Nenhum cliente cadastrado ainda.'}
         </p>
       ) : (
-        <table style={styles.tabela}>
-          <thead>
-            <tr>
-              <th style={styles.th}>Nome</th>
-              <th style={styles.th}>Telefone</th>
-              <th style={styles.th}>Cidade</th>
-              <th style={styles.th}>Contato</th>
-            </tr>
-          </thead>
-          <tbody>
-            {clientesFiltrados.map(c => (
-              <tr key={c.id_cliente} style={styles.tr}>
-                <td style={styles.td}>{c.nome}</td>
-                <td style={styles.td}>{c.telefone}</td>
-                <td style={styles.td}>{c.cidade || '—'}</td>
-                <td style={styles.td}>{c.contato || '—'}</td>
+        <div className="tabela-wrapper">
+          <table style={styles.tabela}>
+            <thead>
+              <tr>
+                <th style={styles.th}>Nome</th>
+                <th style={styles.th}>Telefone</th>
+                <th style={styles.th}>Cidade</th>
+                <th style={styles.th}>Contato</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {clientesFiltrados.map(c => (
+                <tr key={c.id_cliente} style={styles.tr}>
+                  <td style={styles.td}>{c.nome}</td>
+                  <td style={styles.td}>{c.telefone}</td>
+                  <td style={styles.td}>{c.cidade || '—'}</td>
+                  <td style={styles.td}>{c.contato || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {busca && (

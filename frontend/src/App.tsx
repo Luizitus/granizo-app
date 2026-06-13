@@ -23,6 +23,7 @@ function App() {
   return (
     <>
       {usuario && <Navbar />}
+      <div className="container-principal" style={usuario ? { maxWidth: '1100px', margin: '2rem auto', padding: '0 1rem' } : {}}></div>
       <div style={usuario ? { maxWidth: '1100px', margin: '2rem auto', padding: '0 1rem' } : {}}>
         <Routes>
           <Route path="/login" element={<Login />} />

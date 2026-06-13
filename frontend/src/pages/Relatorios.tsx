@@ -102,7 +102,7 @@ function Relatorios() {
 
       <div style={styles.card}>
         <h3 style={styles.cardTitulo}>Filtros</h3>
-        <div style={styles.filtros}>
+        <div className="filtros-responsivos" style={styles.filtros}>
           <div style={styles.campo}>
             <label style={styles.label}>Status</label>
             <select style={styles.input} value={filtroStatus} onChange={e => setFiltroStatus(e.target.value)}>
@@ -126,7 +126,7 @@ function Relatorios() {
       </div>
 
       <div style={styles.card}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+      <div className="cabecalho-card-responsivo" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
           <h3 style={styles.cardTitulo}>{veiculosFiltrados.length} veículo(s) encontrado(s)</h3>
           <div style={{ display: 'flex', gap: '0.75rem' }}>
             <button onClick={exportarPDF} style={styles.botaoPDF}>📄 Exportar PDF</button>
@@ -137,36 +137,38 @@ function Relatorios() {
         {veiculosFiltrados.length === 0 ? (
           <p style={{ color: '#999' }}>Nenhum veículo encontrado para esse filtro.</p>
         ) : (
-          <table style={styles.tabela}>
-            <thead>
-              <tr>
-                <th style={styles.th}>Placa</th>
-                <th style={styles.th}>Modelo</th>
-                <th style={styles.th}>Cliente</th>
-                <th style={styles.th}>Técnico</th>
-                <th style={styles.th}>Entrada</th>
-                <th style={styles.th}>Entrega</th>
-                <th style={styles.th}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {veiculosFiltrados.map(v => (
-                <tr key={v.id_veiculo} style={styles.tr}>
-                  <td style={styles.td}>{v.placa}</td>
-                  <td style={styles.td}>{v.modelo_nome}</td>
-                  <td style={styles.td}>{v.cliente_nome}</td>
-                  <td style={styles.td}>{v.tecnico_nome || '—'}</td>
-                  <td style={styles.td}>{v.data_entrada}</td>
-                  <td style={styles.td}>{v.data_entrega || '—'}</td>
-                  <td style={styles.td}>
-                    <span style={{ ...styles.badge, backgroundColor: cores[v.status] || '#ccc' }}>
-                      {statusLabel[v.status]}
-                    </span>
-                  </td>
+          <div className="tabela-wrapper">
+            <table style={styles.tabela}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>Placa</th>
+                  <th style={styles.th}>Modelo</th>
+                  <th style={styles.th}>Cliente</th>
+                  <th style={styles.th}>Técnico</th>
+                  <th style={styles.th}>Entrada</th>
+                  <th style={styles.th}>Entrega</th>
+                  <th style={styles.th}>Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {veiculosFiltrados.map(v => (
+                  <tr key={v.id_veiculo} style={styles.tr}>
+                    <td style={styles.td}>{v.placa}</td>
+                    <td style={styles.td}>{v.modelo_nome}</td>
+                    <td style={styles.td}>{v.cliente_nome}</td>
+                    <td style={styles.td}>{v.tecnico_nome || '—'}</td>
+                    <td style={styles.td}>{v.data_entrada}</td>
+                    <td style={styles.td}>{v.data_entrega || '—'}</td>
+                    <td style={styles.td}>
+                      <span style={{ ...styles.badge, backgroundColor: cores[v.status] || '#ccc' }}>
+                        {statusLabel[v.status]}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

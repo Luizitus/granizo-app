@@ -101,7 +101,7 @@ function Usuarios() {
           <h3 style={styles.cardTitulo}>{editandoId ? 'Editar Usuário' : 'Novo Usuário'}</h3>
           {erro && <p style={styles.erro}>{erro}</p>}
           <form onSubmit={handleSubmit} style={styles.form}>
-            <div style={styles.linha}>
+            <div className="linha-form-responsiva"  style={styles.linha}>
               <div style={styles.campo}>
                 <label style={styles.label}>Nome *</label>
                 <input style={styles.input} value={form.nome}
@@ -113,7 +113,7 @@ function Usuarios() {
                   onChange={e => setForm({ ...form, email: e.target.value })} required />
               </div>
             </div>
-            <div style={styles.linha}>
+            <div className="linha-form-responsiva"  style={styles.linha}>
               <div style={styles.campo}>
                 <label style={styles.label}>
                   {editandoId ? 'Nova senha (deixe em branco para manter)' : 'Senha *'}
@@ -149,6 +149,7 @@ function Usuarios() {
         {usuarios.length === 0 ? (
           <p style={{ color: '#999' }}>Nenhum usuário cadastrado.</p>
         ) : (
+          <div className="tabela-wrapper">
           <table style={styles.tabela}>
             <thead>
               <tr>
@@ -193,6 +194,7 @@ function Usuarios() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>

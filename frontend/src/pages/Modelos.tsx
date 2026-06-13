@@ -45,7 +45,7 @@ function Modelos() {
       <div style={styles.card}>
         <h3 style={styles.cardTitulo}>Novo Modelo</h3>
         {erro && <p style={styles.erro}>{erro}</p>}
-        <form onSubmit={handleSubmit} style={styles.form}>
+        <form onSubmit={handleSubmit} className="linha-form-responsiva" style={styles.form}>
           <select
             style={styles.input}
             value={form.id_marca}
@@ -75,24 +75,26 @@ function Modelos() {
         {modelos.length === 0 ? (
           <p>Nenhum modelo cadastrado ainda.</p>
         ) : (
-          <table style={styles.tabela}>
-            <thead>
-              <tr>
-                <th style={styles.th}>#</th>
-                <th style={styles.th}>Modelo</th>
-                <th style={styles.th}>Marca</th>
-              </tr>
-            </thead>
-            <tbody>
-              {modelos.map(m => (
-                <tr key={m.id_modelo} style={styles.tr}>
-                  <td style={styles.td}>{m.id_modelo}</td>
-                  <td style={styles.td}>{m.modelo}</td>
-                  <td style={styles.td}>{m.nome_marca}</td>
+          <div className="tabela-wrapper">
+            <table style={styles.tabela}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>#</th>
+                  <th style={styles.th}>Modelo</th>
+                  <th style={styles.th}>Marca</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {modelos.map(m => (
+                  <tr key={m.id_modelo} style={styles.tr}>
+                    <td style={styles.td}>{m.id_modelo}</td>
+                    <td style={styles.td}>{m.modelo}</td>
+                    <td style={styles.td}>{m.nome_marca}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

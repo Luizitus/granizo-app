@@ -86,38 +86,40 @@ function ListaVeiculos() {
           {busca || filtroStatus ? 'Nenhum veículo encontrado.' : 'Nenhum veículo cadastrado ainda.'}
         </p>
       ) : (
-        <table style={styles.tabela}>
-          <thead>
-            <tr>
-              <th style={styles.th}>Placa</th>
-              <th style={styles.th}>Modelo</th>
-              <th style={styles.th}>Cliente</th>
-              <th style={styles.th}>Técnico</th>
-              <th style={styles.th}>Entrada</th>
-              <th style={styles.th}>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {veiculosFiltrados.map(v => (
-              <tr key={v.id_veiculo} style={styles.tr}
-                onClick={() => navigate(`/veiculos/${v.id_veiculo}`)}
-                onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f7fafc')}
-                onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}
-              >
-                <td style={styles.td}>{v.placa}</td>
-                <td style={styles.td}>{v.modelo_nome}</td>
-                <td style={styles.td}>{v.cliente_nome}</td>
-                <td style={styles.td}>{v.tecnico_nome || '—'}</td>
-                <td style={styles.td}>{v.data_entrada}</td>
-                <td style={styles.td}>
-                  <span style={{ ...styles.badge, backgroundColor: cores[v.status] || '#ccc' }}>
-                    {v.status.replace(/_/g, ' ')}
-                  </span>
-                </td>
+        <div className="tabela-wrapper">
+          <table style={styles.tabela}>
+            <thead>
+              <tr>
+                <th style={styles.th}>Placa</th>
+                <th style={styles.th}>Modelo</th>
+                <th style={styles.th}>Cliente</th>
+                <th style={styles.th}>Técnico</th>
+                <th style={styles.th}>Entrada</th>
+                <th style={styles.th}>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {veiculosFiltrados.map(v => (
+                <tr key={v.id_veiculo} style={styles.tr}
+                  onClick={() => navigate(`/veiculos/${v.id_veiculo}`)}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#f7fafc')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}
+                >
+                  <td style={styles.td}>{v.placa}</td>
+                  <td style={styles.td}>{v.modelo_nome}</td>
+                  <td style={styles.td}>{v.cliente_nome}</td>
+                  <td style={styles.td}>{v.tecnico_nome || '—'}</td>
+                  <td style={styles.td}>{v.data_entrada}</td>
+                  <td style={styles.td}>
+                    <span style={{ ...styles.badge, backgroundColor: cores[v.status] || '#ccc' }}>
+                      {v.status.replace(/_/g, ' ')}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {(busca || filtroStatus) && (
@@ -138,7 +140,7 @@ const styles: Record<string, React.CSSProperties> = {
   th: { backgroundColor: '#1a1a2e', color: '#fff', padding: '0.75rem 1rem', textAlign: 'left' },
   tr: { borderBottom: '1px solid #e2e8f0', transition: 'background 0.2s' },
   td: { padding: '0.75rem 1rem' },
-  badge: { padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.8rem', color: '#fff' },
+  badge: { padding: '0.25rem 0.75rem', borderRadius: '999px', fontSize: '0.8rem', color: '#fff', whiteSpace: 'nowrap' },
   botao: { backgroundColor: '#1a1a2e', color: '#fff', padding: '0.5rem 1rem', borderRadius: '6px', textDecoration: 'none' },
 }
 
