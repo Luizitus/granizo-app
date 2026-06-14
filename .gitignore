@@ -5,7 +5,7 @@ backend/granizo.db-shm
 backend/granizo.db-wal
 backend/uploads/*
 !backend/uploads/.gitkeep
-!backend/.env
+backend/.env
 
 # Frontend
 frontend/node_modules
