@@ -51,4 +51,24 @@ const deletar = async (req, res) => {
   }
 }
 
-module.exports = { listar, cadastrar, buscarPorId, deletar }
+const atualizar = async (req, res) => {
+  const { nome, endereco, cidade, telefone, contato, tipo_contato } = req.body
+
+  if (!nome || !telefone) {
+    return res.status(400).json({ erro: 'Nome e telefone são obrigatórios.' })
+  }
+
+  try {
+    const result = await execute(`
+      UPDATE cliente SET nome = ?, endereco = ?, cidade = ?, telefone = ?, contato = ?, tipo_contato = ?
+      WHERE id_cliente = ?
+    `, [nome, endereco, cidade, telefone, contato, tipo_contato, req.params.id])
+
+    if (result.changes === 0) return res.status(404).json({ erro: 'Cliente não encontrado.' })
+    res.json({ mensagem: 'Cliente atualizado com sucesso.' })
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao atualizar cliente.' })
+  }
+}
+
+module.exports = { listar, cadastrar, buscarPorId, deletar, atualizar }

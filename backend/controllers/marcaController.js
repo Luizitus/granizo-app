@@ -36,4 +36,18 @@ const deletar = async (req, res) => {
     res.status(500).json({ erro: 'Erro ao remover marca.' })
   }
 }
-module.exports = { listar, cadastrar, deletar }
+
+const atualizar = async (req, res) => {
+  const { marca } = req.body
+
+  if (!marca) return res.status(400).json({ erro: 'Nome da marca é obrigatório.' })
+
+  try {
+    const result = await execute('UPDATE marca SET marca = ? WHERE id_marca = ?', [marca, req.params.id])
+    if (result.changes === 0) return res.status(404).json({ erro: 'Marca não encontrada.' })
+    res.json({ mensagem: 'Marca atualizada com sucesso.' })
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao atualizar marca.' })
+  }
+}
+module.exports = { listar, cadastrar, deletar, atualizar }
